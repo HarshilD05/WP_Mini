@@ -5,19 +5,30 @@ import './RequestCard.css';
 const StatusBadge = ({ status }) => {
   const icons = {
     pending: <Clock size={14} />,
+    'in-review': <Clock size={14} />,
     approved: <CheckCircle size={14} />,
     rejected: <XCircle size={14} />
+  };
+  
+  const labels = {
+    pending: 'Pending',
+    'in-review': 'In Review',
+    approved: 'Approved',
+    rejected: 'Rejected'
   };
   
   return (
     <span className={`status-badge status-${status}`}>
       {icons[status]}
-      {status.charAt(0).toUpperCase() + status.slice(1)}
+      {labels[status] || status.charAt(0).toUpperCase() + status.slice(1)}
     </span>
   );
 };
 
 const RequestCard = ({ request, onClick }) => {
+  // Use viewStatus if available, otherwise fall back to status
+  const displayStatus = request.viewStatus || request.status;
+  
   return (
     <div className="request-card" onClick={() => onClick(request)}>
       <div className="request-card-left">
@@ -36,7 +47,7 @@ const RequestCard = ({ request, onClick }) => {
         </div>
       </div>
       <div className="request-card-right">
-        <StatusBadge status={request.status} />
+        <StatusBadge status={displayStatus} />
         <ChevronRight size={20} className="chevron-icon" />
       </div>
     </div>

@@ -11,6 +11,7 @@ const TeacherHome = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRequest, setSelectedRequest] = useState(null);
+  const userRole = sessionStorage.getItem('userRole')?.toLowerCase();
 
   // Fetch requests on mount
   useEffect(() => {
@@ -30,19 +31,60 @@ const TeacherHome = () => {
     fetchRequests();
   }, []);
 
-  const filteredRequests = requests.filter(req => {
-    const matchesTab = activeTab === 'all' || req.status === activeTab;
+  // Map roles to approval stages
+  const getRoleStage = (role) => {
+    const roleMap = {
+      'faculty coordinator': 2,
+      'tpo': 3,
+      'vice principal': 4,
+      'principal': 5
+    };
+    return roleMap[role] || 0;
+  };
+
+  const myStage = getRoleStage(userRole);
+
+  // Categorize requests based on user's role and approval stage
+  const categorizeRequests = () => {
+    return requests.map(req => {
+      // Skip if already approved or rejected globally
+      if (req.status === 'approved' || req.status === 'rejected') {
+        return { ...req, viewStatus: req.status };
+      }
+
+      const currentStage = req.approvalStage;
+      
+      // Pending: Current stage matches my role stage (my turn to approve)
+      if (currentStage === myStage) {
+        return { ...req, viewStatus: 'pending' };
+      }
+      
+      // In Review: I already approved (stage passed my level) but not final approved
+      if (currentStage > myStage && req.status !== 'approved') {
+        return { ...req, viewStatus: 'in-review' };
+      }
+      
+      // Not yet reached my level - don't show
+      return { ...req, viewStatus: 'hidden' };
+    }).filter(req => req.viewStatus !== 'hidden');
+  };
+
+  const categorizedRequests = categorizeRequests();
+
+  const filteredRequests = categorizedRequests.filter(req => {
+    const matchesTab = activeTab === 'all' || req.viewStatus === activeTab;
     const matchesSearch = 
       req.eventName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      req.studentName.toLowerCase().includes(searchQuery.toLowerCase());
+      (req.studentName && req.studentName.toLowerCase().includes(searchQuery.toLowerCase()));
     return matchesTab && matchesSearch;
   });
 
   const stats = {
-    total: requests.length,
-    pending: requests.filter(r => r.status === 'pending').length,
-    approved: requests.filter(r => r.status === 'approved').length,
-    rejected: requests.filter(r => r.status === 'rejected').length,
+    total: categorizedRequests.length,
+    pending: categorizedRequests.filter(r => r.viewStatus === 'pending').length,
+    inReview: categorizedRequests.filter(r => r.viewStatus === 'in-review').length,
+    approved: categorizedRequests.filter(r => r.viewStatus === 'approved').length,
+    rejected: categorizedRequests.filter(r => r.viewStatus === 'rejected').length,
   };
 
   const handleApprove = async (requestId) => {
@@ -104,13 +146,13 @@ const TeacherHome = () => {
       <div className="list-container">
         <div className="list-controls">
           <div className="tabs">
-            {['pending', 'approved', 'rejected', 'all'].map(tab => (
+            {['pending', 'in-review', 'approved', 'rejected', 'all'].map(tab => (
               <button 
                 key={tab} 
                 onClick={() => setActiveTab(tab)}
                 className={`tab-btn ${activeTab === tab ? 'active' : ''}`}
               >
-                {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                {tab === 'in-review' ? 'In Review' : tab.charAt(0).toUpperCase() + tab.slice(1)}
               </button>
             ))}
           </div>
@@ -199,7 +241,7 @@ const TeacherHome = () => {
               <button className="btn btn-cancel" onClick={() => setSelectedRequest(null)}>
                 Close
               </button>
-              {selectedRequest.status === 'pending' && (
+              {selectedRequest.viewStatus === 'pending' && (
                 <>
                   <button 
                     className="btn btn-reject" 

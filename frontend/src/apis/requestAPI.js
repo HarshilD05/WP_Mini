@@ -33,7 +33,8 @@ const transformRequestData = (apiRequest) => {
   });
   
   return {
-    id: apiRequest.requestId,
+    id: apiRequest._id,
+    requestId: apiRequest.requestId,
     eventName: apiRequest.eventName,
     committee: apiRequest.committee,
     date: formattedDate,

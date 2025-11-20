@@ -31,17 +31,48 @@ const StudentHome = () => {
     fetchRequests();
   }, []);
 
-  const filteredRequests = requests.filter(req => {
-    const matchesTab = activeTab === 'all' || req.status === activeTab;
+  // Categorize requests based on approval stage
+  // For students:
+  // - Pending: Stage 1 (waiting for Faculty Coordinator)
+  // - In Review: Stage > 1 (approved by Faculty, waiting for higher authority)
+  // - Approved/Rejected: Final status
+  const categorizeRequests = () => {
+    return requests.map(req => {
+      // Keep final statuses as is
+      if (req.status === 'approved' || req.status === 'rejected') {
+        return { ...req, viewStatus: req.status };
+      }
+
+      const currentStage = req.approvalStage;
+      
+      // Stage 1: Pending at Faculty Coordinator level
+      if (currentStage === 1) {
+        return { ...req, viewStatus: 'pending' };
+      }
+      
+      // Stage > 1: In review with higher authorities
+      if (currentStage > 1) {
+        return { ...req, viewStatus: 'in-review' };
+      }
+      
+      return { ...req, viewStatus: 'pending' };
+    });
+  };
+
+  const categorizedRequests = categorizeRequests();
+
+  const filteredRequests = categorizedRequests.filter(req => {
+    const matchesTab = activeTab === 'all' || req.viewStatus === activeTab;
     const matchesSearch = req.eventName.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesTab && matchesSearch;
   });
 
   const stats = {
-    total: requests.length,
-    pending: requests.filter(r => r.status === 'pending').length,
-    approved: requests.filter(r => r.status === 'approved').length,
-    rejected: requests.filter(r => r.status === 'rejected').length,
+    total: categorizedRequests.length,
+    pending: categorizedRequests.filter(r => r.viewStatus === 'pending').length,
+    inReview: categorizedRequests.filter(r => r.viewStatus === 'in-review').length,
+    approved: categorizedRequests.filter(r => r.viewStatus === 'approved').length,
+    rejected: categorizedRequests.filter(r => r.viewStatus === 'rejected').length,
   };
 
   const handleNewRequest = () => {
@@ -84,13 +115,13 @@ const StudentHome = () => {
       <div className="list-container">
         <div className="list-controls">
           <div className="tabs">
-            {['all', 'pending', 'approved', 'rejected'].map(tab => (
+            {['all', 'pending', 'in-review', 'approved', 'rejected'].map(tab => (
               <button 
                 key={tab} 
                 onClick={() => setActiveTab(tab)}
                 className={`tab-btn ${activeTab === tab ? 'active' : ''}`}
               >
-                {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                {tab === 'in-review' ? 'In Review' : tab.charAt(0).toUpperCase() + tab.slice(1)}
               </button>
             ))}
           </div>

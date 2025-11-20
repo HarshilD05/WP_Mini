@@ -256,6 +256,11 @@
   color: var(--status-pending);
 }
 
+.status-badge-large.status-in-review {
+  background: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
+}
+
 .status-badge-large.status-approved {
   background: rgba(34, 197, 94, 0.15);
   color: var(--status-approved);
