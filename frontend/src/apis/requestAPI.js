@@ -222,6 +222,33 @@ export const rejectRequest = async (reqId, reason) => {
 };
 
 /**
+ * Download approval slip for a request
+ * @param {string} reqId - Request ID
+ * @returns {Promise<Blob>} PDF blob
+ */
+export const downloadSlip = async (reqId) => {
+  try {
+    const token = localStorage.getItem('authToken');
+    const response = await fetch(`${API_BASE_URL}/api/requests/${reqId}/download`, {
+      method: 'GET',
+      headers: {
+        'Authorization': token ? `Bearer ${token}` : '',
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ message: 'Failed to download slip' }));
+      throw new Error(error.message || 'Failed to download slip');
+    }
+
+    return await response.blob();
+  } catch (error) {
+    console.error('Error downloading slip:', error);
+    throw error;
+  }
+};
+
+/**
  * Fetches the list of available locations
  * Currently reads from local JSON file
  * TODO: Update to fetch from server API endpoint

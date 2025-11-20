@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Plus, Search, X, AlertCircle, Download } from 'lucide-react';
 import RequestCard from '../components/RequestCard';
 import ApprovalProgress from '../components/ApprovalProgress';
-import { getMyRequests } from '../apis/requestAPI';
+import { getMyRequests, downloadSlip } from '../apis/requestAPI';
 import './StudentHome.css';
 
 const StudentHome = () => {
@@ -77,6 +77,23 @@ const StudentHome = () => {
 
   const handleNewRequest = () => {
     navigate('/request-form');
+  };
+
+  const handleDownloadSlip = async (requestId) => {
+    try {
+      const blob = await downloadSlip(requestId);
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `approval-slip-${requestId}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading slip:', error);
+      alert('Failed to download slip. Please try again.');
+    }
   };
 
   return (
@@ -208,8 +225,11 @@ const StudentHome = () => {
               <button className="btn btn-cancel" onClick={() => setSelectedRequest(null)}>
                 Close
               </button>
-              {selectedRequest.status === 'approved' && (
-                <button className="btn btn-download">
+              {selectedRequest.viewStatus === 'approved' && (
+                <button 
+                  className="btn btn-download" 
+                  onClick={() => handleDownloadSlip(selectedRequest.id)}
+                >
                   <Download size={18} /> Download Slip
                 </button>
               )}
