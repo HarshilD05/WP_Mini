@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { Mail, Lock, CheckCircle, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { login } from '../apis/authAPI';
 import './Login.css';
 
@@ -11,16 +12,7 @@ function Login() {
   });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    // Clear error when user starts typing
-    if (error) setError('');
-  };
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -46,65 +38,103 @@ function Login() {
   };
 
   return (
-    <div className="login-container">
-      <div className="login-card">
-        <div className="login-header">
-          <h1>Welcome Back</h1>
-          <p>Sign in to continue</p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="login-form">
-          {error && (
-            <div className="error-message">
-              {error}
+    <div className="auth-container">
+      <div className="auth-card">
+        
+        {/* Branding Side */}
+        <div className="brand-section">
+          <div className="circle-deco-1"></div>
+          <div className="circle-deco-2"></div>
+          
+          <div className="brand-header">
+            <div className="logo-icon">
+              <CheckCircle size={32} />
             </div>
-          )}
-
-          <div className="form-group">
-            <label htmlFor="email">Email</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="Enter your email"
-              disabled={isLoading}
-              autoComplete="email"
-            />
+            <h1 className="brand-title">ApproveFlow</h1>
           </div>
 
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Enter your password"
-              disabled={isLoading}
-              autoComplete="current-password"
-            />
+          <div className="hero-text" style={{position: 'relative', zIndex: 10}}>
+            <h2>Welcome Back!</h2>
+            <p>The Smart Permission & Event Approval Portal designed to streamline institutional workflows.</p>
           </div>
-
-          <button 
-            type="submit" 
-            className="login-button"
-            disabled={isLoading}
-          >
-            {isLoading ? 'Signing in...' : 'Sign In'}
-          </button>
-        </form>
-
-        <div className="login-footer">
-          <p>
-            Don't have an account?{' '}
-            <Link to="/signup" className="signup-link">
-              Sign up
-            </Link>
-          </p>
+          
+          <div style={{marginTop: 'auto', paddingTop: '3rem', position: 'relative', zIndex: 10}}>
+             <small style={{color: '#DBEAFE'}}>Powered by Institutional IT Cell</small>
+          </div>
         </div>
+
+        {/* Form Side */}
+        <div className="form-section">
+          <div className="form-header">
+            <h3>Sign In</h3>
+            <p>Access your dashboard to manage permissions.</p>
+
+            <form onSubmit={handleSubmit}>
+              {error && (
+                <div className="error-message">
+                  {error}
+                </div>
+              )}
+
+              <div className="input-group">
+                <label>Institutional Email</label>
+                <div className="input-wrapper">
+                  <Mail className="input-icon" size={20} />
+                  <input 
+                    type="email" 
+                    className="form-input"
+                    placeholder="id@institution.edu"
+                    value={formData.email}
+                    onChange={(e) => setFormData({...formData, email: e.target.value})}
+                    required 
+                  />
+                </div>
+              </div>
+
+              <div className="input-group">
+                <label>Password</label>
+                <div className="input-wrapper">
+                  <Lock className="input-icon" size={20} />
+                  <input 
+                    type={showPassword ? "text" : "password"}
+                    className="form-input"
+                    placeholder="••••••••"
+                    value={formData.password}
+                    onChange={(e) => setFormData({...formData, password: e.target.value})}
+                    required 
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    style={{position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#9CA3AF'}}
+                  >
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </button>
+                </div>
+              </div>
+
+              <div style={{display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem'}}>
+                <a href="#" style={{color: '#1976D2', fontSize: '0.875rem', textDecoration: 'none'}}>Forgot Password?</a>
+              </div>
+
+              <button type="submit" className="submit-btn" disabled={isLoading}>
+                {isLoading ? 'Logging in...' : (
+                  <>
+                    Login to Dashboard <ArrowRight size={20} />
+                  </>
+                )}
+              </button>
+            </form>
+
+            <div className="toggle-text">
+              Don't have an account yet?{' '}
+              <Link to="/signup" className="toggle-link">
+                Sign Up
+              </Link>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   );

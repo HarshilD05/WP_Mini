@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { Mail, Lock, User, CheckCircle, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { signup } from '../apis/authAPI';
 import './Signup.css';
 
@@ -13,16 +14,8 @@ function Signup() {
   });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    // Clear error when user starts typing
-    if (error) setError('');
-  };
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const validateForm = () => {
     if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
@@ -76,93 +69,136 @@ function Signup() {
   };
 
   return (
-    <div className="signup-container">
-      <div className="signup-card">
-        <div className="signup-header">
-          <h1>Create Account</h1>
-          <p>Sign up to get started</p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="signup-form">
-          {error && (
-            <div className="error-message">
-              {error}
+    <div className="auth-container">
+      <div className="auth-card">
+        
+        {/* Branding Side */}
+        <div className="brand-section">
+          <div className="circle-deco-1"></div>
+          <div className="circle-deco-2"></div>
+          
+          <div className="brand-header">
+            <div className="logo-icon">
+              <CheckCircle size={32} />
             </div>
-          )}
-
-          <div className="form-group">
-            <label htmlFor="name">Full Name</label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              placeholder="Enter your full name"
-              disabled={isLoading}
-              autoComplete="name"
-            />
+            <h1 className="brand-title">ApproveFlow</h1>
           </div>
 
-          <div className="form-group">
-            <label htmlFor="email">Email</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="Enter your email"
-              disabled={isLoading}
-              autoComplete="email"
-            />
+          <div className="hero-text" style={{position: 'relative', zIndex: 10}}>
+            <h2>Join ApproveFlow</h2>
+            <p>Create your account to start managing permissions and streamline your institutional workflows efficiently.</p>
           </div>
-
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Create a password"
-              disabled={isLoading}
-              autoComplete="new-password"
-            />
+          
+          <div style={{marginTop: 'auto', paddingTop: '3rem', position: 'relative', zIndex: 10}}>
+             <small style={{color: '#DBEAFE'}}>Powered by Institutional IT Cell</small>
           </div>
-
-          <div className="form-group">
-            <label htmlFor="confirmPassword">Confirm Password</label>
-            <input
-              type="password"
-              id="confirmPassword"
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              placeholder="Confirm your password"
-              disabled={isLoading}
-              autoComplete="new-password"
-            />
-          </div>
-
-          <button 
-            type="submit" 
-            className="signup-button"
-            disabled={isLoading}
-          >
-            {isLoading ? 'Creating Account...' : 'Sign Up'}
-          </button>
-        </form>
-
-        <div className="signup-footer">
-          <p>
-            Already have an account?{' '}
-            <Link to="/login" className="login-link">
-              Sign in
-            </Link>
-          </p>
         </div>
+
+        {/* Form Side */}
+        <div className="form-section">
+          <div className="form-header">
+            <h3>Create Account</h3>
+            <p>Sign up to get started with ApproveFlow.</p>
+
+            <form onSubmit={handleSubmit}>
+              {error && (
+                <div className="error-message">
+                  {error}
+                </div>
+              )}
+
+              <div className="input-group">
+                <label>Full Name</label>
+                <div className="input-wrapper">
+                  <User className="input-icon" size={20} />
+                  <input 
+                    type="text" 
+                    className="form-input"
+                    placeholder="Enter your full name"
+                    value={formData.name}
+                    onChange={(e) => setFormData({...formData, name: e.target.value})}
+                    required 
+                  />
+                </div>
+              </div>
+
+              <div className="input-group">
+                <label>Institutional Email</label>
+                <div className="input-wrapper">
+                  <Mail className="input-icon" size={20} />
+                  <input 
+                    type="email" 
+                    className="form-input"
+                    placeholder="id@institution.edu"
+                    value={formData.email}
+                    onChange={(e) => setFormData({...formData, email: e.target.value})}
+                    required 
+                  />
+                </div>
+              </div>
+
+              <div className="input-group">
+                <label>Password</label>
+                <div className="input-wrapper">
+                  <Lock className="input-icon" size={20} />
+                  <input 
+                    type={showPassword ? "text" : "password"}
+                    className="form-input"
+                    placeholder="Create a password"
+                    value={formData.password}
+                    onChange={(e) => setFormData({...formData, password: e.target.value})}
+                    required 
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    style={{position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#9CA3AF'}}
+                  >
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </button>
+                </div>
+              </div>
+
+              <div className="input-group">
+                <label>Confirm Password</label>
+                <div className="input-wrapper">
+                  <Lock className="input-icon" size={20} />
+                  <input 
+                    type={showConfirmPassword ? "text" : "password"}
+                    className="form-input"
+                    placeholder="Confirm your password"
+                    value={formData.confirmPassword}
+                    onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
+                    required 
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    style={{position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#9CA3AF'}}
+                  >
+                    {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </button>
+                </div>
+              </div>
+
+              <button type="submit" className="submit-btn" disabled={isLoading}>
+                {isLoading ? 'Creating Account...' : (
+                  <>
+                    Create Account <ArrowRight size={20} />
+                  </>
+                )}
+              </button>
+            </form>
+
+            <div className="toggle-text">
+              Already have an account?{' '}
+              <Link to="/login" className="toggle-link">
+                Sign In
+              </Link>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   );
