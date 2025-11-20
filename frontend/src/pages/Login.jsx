@@ -28,8 +28,8 @@ function Login() {
 
     try {
       await login(formData);
-      // Redirect to home page after successful login
-      navigate('/');
+      // Redirect to dashboard after successful login
+      navigate('/dashboard');
     } catch (err) {
       setError(err.message || 'Invalid email or password');
     } finally {

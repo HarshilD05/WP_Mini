@@ -59,8 +59,8 @@ function Signup() {
     try {
       const { name, email, password } = formData;
       await signup({ name, email, password });
-      // Redirect to home page after successful signup
-      navigate('/');
+      // Redirect to dashboard after successful signup
+      navigate('/dashboard');
     } catch (err) {
       setError(err.message || 'An error occurred during signup');
     } finally {

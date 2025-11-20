@@ -3,6 +3,7 @@ import Home from './pages/Home'
 import RequestForm from './pages/RequestForm'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
+import StudentDashboard from './pages/StudentDashboard'
 import './App.css'
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
         <Route path="/request-form" element={<RequestForm />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/dashboard" element={<StudentDashboard />} />
       </Routes>
     </Router>
   )
