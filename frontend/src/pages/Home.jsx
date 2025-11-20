@@ -18,6 +18,12 @@ const Home = () => {
           >
             Create New Request
           </button>
+          <button 
+            className="secondary-button"
+            onClick={() => navigate('/calendar')}
+          >
+            View Calendar
+          </button>
         </div>
       </div>
     </div>

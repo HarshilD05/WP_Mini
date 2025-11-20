@@ -1,0 +1,34 @@
+[
+  {
+    "id": 1,
+    "committee": "ACM",
+    "faculty": "rajesh.kumar@college.edu",
+    "facultyName": "Dr. Rajesh Kumar",
+    "location": "Seminar Hall",
+    "floor": null,
+    "fromDateTime": "2025-11-25T10:00",
+    "toDateTime": "2025-11-25T14:00",
+    "description": "ACM is organizing a technical workshop on Web Development using React and Node.js. We expect around 150 students to attend. The workshop will include hands-on sessions and a Q&A panel with industry experts.",
+    "stallCost": null,
+    "stallDescription": null,
+    "status": "pending",
+    "submittedDate": "2025-11-20T09:30",
+    "submittedBy": "Rahul Sharma"
+  },
+  {
+    "id": 2,
+    "committee": "Synapse",
+    "faculty": "priya.sharma@college.edu",
+    "facultyName": "Prof. Priya Sharma",
+    "location": "Stall",
+    "floor": "2",
+    "fromDateTime": "2025-11-28T09:00",
+    "toDateTime": "2025-11-28T17:00",
+    "description": "Synapse cultural committee is hosting a mini exhibition showcasing student art, photography, and creative projects. The event aims to promote creativity and provide a platform for students to display their talents.",
+    "stallCost": "5000",
+    "stallDescription": "Art exhibition stall with display boards, lighting arrangements, and space for 20+ artworks. We will also have a small interactive corner for live sketching demonstrations.",
+    "status": "approved",
+    "submittedDate": "2025-11-18T14:20",
+    "submittedBy": "Priya Mehta"
+  }
+]
