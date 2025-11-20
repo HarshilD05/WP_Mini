@@ -11,6 +11,8 @@ const TeacherHome = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRequest, setSelectedRequest] = useState(null);
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [rejectionReason, setRejectionReason] = useState('');
   const userRole = sessionStorage.getItem('userRole')?.toLowerCase();
 
   // Fetch requests on mount
@@ -100,17 +102,34 @@ const TeacherHome = () => {
     }
   };
 
-  const handleReject = async (requestId, reason) => {
+  const handleReject = async () => {
+    if (!rejectionReason.trim()) {
+      alert('Please provide a rejection reason.');
+      return;
+    }
+    
     try {
-      await rejectRequest(requestId, reason);
+      await rejectRequest(selectedRequest.id, rejectionReason);
       // Refresh the requests list after rejection
       const data = await getAllRequests();
       setRequests(data);
       setSelectedRequest(null);
+      setShowRejectModal(false);
+      setRejectionReason('');
     } catch (error) {
       console.error('Error rejecting request:', error);
       alert('Failed to reject request. Please try again.');
     }
+  };
+
+  const openRejectModal = () => {
+    setShowRejectModal(true);
+    setRejectionReason('');
+  };
+
+  const closeRejectModal = () => {
+    setShowRejectModal(false);
+    setRejectionReason('');
   };
 
   return (
@@ -245,10 +264,7 @@ const TeacherHome = () => {
                 <>
                   <button 
                     className="btn btn-reject" 
-                    onClick={() => {
-                      const reason = prompt('Enter rejection reason:');
-                      if (reason) handleReject(selectedRequest.id, reason);
-                    }}
+                    onClick={openRejectModal}
                   >
                     Reject
                   </button>
@@ -257,6 +273,43 @@ const TeacherHome = () => {
                   </button>
                 </>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Rejection Modal */}
+      {showRejectModal && (
+        <div className="modal-overlay" onClick={closeRejectModal}>
+          <div className="modal-content rejection-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Reject Request</h2>
+              <button className="close-btn" onClick={closeRejectModal}>
+                <X size={24} />
+              </button>
+            </div>
+            <div className="modal-body">
+              <p className="rejection-modal-text">Please provide a reason for rejecting this request:</p>
+              <textarea
+                className="rejection-textarea"
+                placeholder="Enter rejection reason..."
+                value={rejectionReason}
+                onChange={(e) => setRejectionReason(e.target.value)}
+                rows={5}
+                autoFocus
+              />
+            </div>
+            <div className="modal-footer">
+              <button className="btn btn-cancel" onClick={closeRejectModal}>
+                Cancel
+              </button>
+              <button 
+                className="btn btn-reject" 
+                onClick={handleReject}
+                disabled={!rejectionReason.trim()}
+              >
+                Reject Request
+              </button>
             </div>
           </div>
         </div>
