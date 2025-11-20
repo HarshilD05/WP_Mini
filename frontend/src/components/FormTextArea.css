@@ -1,0 +1,30 @@
+.form-textarea-container {
+  margin-bottom: 1.5rem;
+}
+
+.form-textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+  resize: vertical;
+  min-height: 100px;
+  background: white;
+  color: #0a0a0a;
+}
+
+.form-textarea:focus {
+  outline: none;
+  border-color: #0a0a0a;
+  box-shadow: 0 0 0 3px rgba(10, 10, 10, 0.1);
+}
+
+.form-textarea:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+  color: #999;
+}

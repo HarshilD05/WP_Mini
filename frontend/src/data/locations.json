@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "value": "seminar_hall",
+    "label": "Seminar Hall",
+    "capacity": 200
+  },
+  {
+    "id": 2,
+    "value": "library_seminar_hall",
+    "label": "Library Seminar Hall",
+    "capacity": 150
+  },
+  {
+    "id": 3,
+    "value": "stall",
+    "label": "Stall",
+    "capacity": 50
+  },
+  {
+    "id": 4,
+    "value": "canteen",
+    "label": "Canteen",
+    "capacity": 100
+  }
+]

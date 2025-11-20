@@ -16,7 +16,7 @@ Request FORM Content
 - From date Time , to date Time
 - Stall Cost 
 - Stall Descrtion text Area
-- Send to 
+- Send to Faculty
 
 
 HD - Admin 

@@ -1,0 +1,41 @@
+.datetime-picker-container {
+  margin-bottom: 0;
+  max-width: 500px;
+}
+
+.datetime-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+  background-color: white;
+  cursor: pointer;
+  color: #0a0a0a;
+}
+
+.datetime-input:focus {
+  outline: none;
+  border-color: #0a0a0a;
+  box-shadow: 0 0 0 3px rgba(10, 10, 10, 0.1);
+}
+
+.datetime-input:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+  color: #999;
+}
+
+/* Custom styling for webkit browsers */
+.datetime-input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  padding: 0.25rem;
+  filter: invert(0);
+}
+
+.datetime-input::-webkit-calendar-picker-indicator:hover {
+  background-color: rgba(10, 10, 10, 0.05);
+  border-radius: 4px;
+}
