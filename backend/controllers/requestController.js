@@ -4,7 +4,7 @@ const Venue = require("../models/Venue");
 const {bookVenueAndRejectConflicts, timeOverlap} = require("../utils/venueHelper");
 const {createCalendarEventForRequest} = require("../utils/calendarHelper");
 const generateRequestPDF = require("../utils/requestPdfGenerator");
-//const {sendEmail} = require("../utils/emailService");
+const {sendEmail} = require("../utils/emailService");
 
 
 async function buildApprovalChainForCommittee(committee) {
@@ -92,14 +92,14 @@ exports.createRequest = async (req, res) => {
     
     const nextApprover = await resolveNextApprover(newRequest);
 
-    /*
+    
     if (nextApprover && nextApprover.email) {
-      //sendEmail({
+      sendEmail({
         to: nextApprover.email,
         subject: `Request ${newRequest.requestId} awaiting your approval`,
         text: `Please review request ${newRequest.requestId}`
       });
-    }*/
+    }
 
     return res.status(201).json({
       success: true,
@@ -143,16 +143,16 @@ exports.approveRequest = async (req, res) => {
 
       
       const nextUser = await User.findById(r.currentApprover);
-      /*
+      
       if (nextUser && nextUser.email) {
-        //sendEmail({ to: nextUser.email, subject: `Request ${r.requestId} awaiting your approval`, text: `Please review.` });
-      }*/
+        sendEmail({ to: nextUser.email, subject: `Request ${r.requestId} awaiting your approval`, text: `Please review.` });
+      }
       
       const student = await User.findById(r.userId);
-      /*
+      
       if (student && student.email) {
-        //sendEmail({ to: student.email, subject: `Request ${r.requestId} moved to ${r.approvalChain[nextIndex].role}`, text: `Your request moved forward.` });
-      }*/
+        sendEmail({ to: student.email, subject: `Request ${r.requestId} moved to ${r.approvalChain[nextIndex].role}`, text: `Your request moved forward.` });
+      }
 
       const nextApprover = await resolveNextApprover(r);
       return res.json({ success: true, message: "Step approved and forwarded", data: { request: r, nextApprover } });
@@ -177,14 +177,13 @@ exports.approveRequest = async (req, res) => {
       
       const student = await User.findById(r.userId);
       if (student && student.email) {
-        //sendEmail({ to: student.email, subject: `Request ${r.requestId} approved`, text: `Your request approved. Download: ${pdfPath}` });
+        sendEmail({ to: student.email, subject: `Request ${r.requestId} approved`, text: `Your request approved. Download: ${pdfPath}` });
       }
 
       
       const globalApprovers = await User.find({ role: { $in: ["TPO", "Vice Principal", "Principal"] } });
       for (const ga of globalApprovers) {
-        if (ga.email)
-            {} //sendEmail({ to: ga.email, subject: `Request ${r.requestId} approved`, text: `Request approved.` });
+        if (ga.email) sendEmail({ to: ga.email, subject: `Request ${r.requestId} approved`, text: `Request approved.` });
       }
 
       return res.json({ success: true, message: "Request fully approved", data: { request: r, pdfPath } });
@@ -228,7 +227,7 @@ exports.rejectRequest = async (req, res) => {
 
     const student = await User.findById(r.userId);
     if (student && student.email) {
-      //sendEmail({ to: student.email, subject: `Request ${r.requestId} rejected`, text: `Reason: ${reason}` });
+      sendEmail({ to: student.email, subject: `Request ${r.requestId} rejected`, text: `Reason: ${reason}` });
     }
 
     return res.json({ success: true, message: "Request rejected", data: r });
