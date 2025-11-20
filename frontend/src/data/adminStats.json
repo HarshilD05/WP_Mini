@@ -1,0 +1,12 @@
+{
+  "userDistribution": [
+    { "name": "Students", "value": 145 },
+    { "name": "Teachers", "value": 38 }
+  ],
+  "requestsThisMonth": [
+    { "name": "Pending", "value": 12 },
+    { "name": "Approved", "value": 25 },
+    { "name": "Rejected", "value": 5 }
+  ],
+  "totalRequests": 42
+}

@@ -27,9 +27,14 @@ function Login() {
     }
 
     try {
-      await login(formData);
-      // Redirect to dashboard after successful login
-      navigate('/dashboard');
+      const response = await login(formData);
+      // Store user data in session storage
+      sessionStorage.setItem('userId', response.userId);
+      sessionStorage.setItem('userRole', response.role);
+      sessionStorage.setItem('userName', response.name);
+      
+      // Redirect to home which will redirect based on role
+      navigate('/');
     } catch (err) {
       setError(err.message || 'Invalid email or password');
     } finally {

@@ -1,0 +1,8 @@
+.user-profile-page{min-height:100vh;padding:2rem;background:#0a0a0a;color:#fff}
+.back-btn{background:none;border:1px solid #ccc;padding:0.5rem 0.75rem;border-radius:6px;color:#fff;margin-bottom:1rem}
+.profile-card{background:white;color:#0a0a0a;padding:1.25rem;border-radius:10px;display:flex;gap:1rem;align-items:center}
+.profile-avatar{width:90px;height:90px;border-radius:50%;background:#0a0a0a;color:white;display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:800}
+.profile-info h2{margin:0}
+.profile-info .muted{color:#666}
+.meta{color:#333;margin-top:0.5rem}
+.signature img{max-width:200px;margin-top:1rem}

@@ -11,18 +11,39 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
  */
 export const login = async ({ email, password }) => {
   try {
+    // TODO: Replace with actual API call
+    // Simulating API response for development
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Mock user data - replace with actual API response
+    const mockResponse = {
+      userId: '123',
+      name: 'Admin User',
+      role: 'admin', // or 'student', 'teacher'
+      email: email,
+      token: 'mock-jwt-token'
+    };
+    
+    // Store token in localStorage
+    if (mockResponse.token) {
+      localStorage.setItem('token', mockResponse.token);
+    }
+    
+    return mockResponse;
+    
+    /* 
+    // Uncomment when backend is ready
     const response = await axios.post(`${API_BASE_URL}/auth/login`, {
       email,
       password
     });
     
-    // Store token in localStorage
     if (response.data.token) {
       localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
     }
     
     return response.data;
+    */
   } catch (error) {
     console.error('Login error:', error);
     throw error.response?.data || { message: 'An error occurred during login' };

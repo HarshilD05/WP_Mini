@@ -1,0 +1,7 @@
+.admin-home-page{min-height:100vh;padding:2rem;background:var(--accent-primary)}
+.admin-home-page .admin-header{color:var(--bg-primary);margin-bottom:1.5rem}
+.admin-stats-row{display:flex;gap:1.25rem}
+.stat-card{background:var(--bg-primary);padding:1.5rem;border-radius:10px;flex:1;border:1px solid var(--border-primary)}
+.stat-card h3{margin-top:0;margin-bottom:1rem;color:var(--text-primary);font-size:1.1rem}
+.count-large{font-size:3rem;color:var(--text-primary);font-weight:800;display:flex;align-items:center;justify-content:center;height:200px}
+@media(max-width:900px){.admin-stats-row{flex-direction:column}}

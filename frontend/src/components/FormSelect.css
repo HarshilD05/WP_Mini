@@ -6,26 +6,26 @@
 .form-select {
   width: 100%;
   padding: 0.75rem;
-  border: 2px solid #e0e0e0;
+  border: 2px solid var(--border-secondary);
   border-radius: 6px;
   font-size: 1rem;
   transition: all 0.3s ease;
   box-sizing: border-box;
-  background-color: white;
+  background-color: var(--bg-primary);
   cursor: pointer;
-  color: #0a0a0a;
+  color: var(--text-primary);
 }
 
 .form-select:focus {
   outline: none;
-  border-color: #0a0a0a;
-  box-shadow: 0 0 0 3px rgba(10, 10, 10, 0.1);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px var(--focus-ring);
 }
 
 .form-select:disabled {
-  background-color: #f5f5f5;
+  background-color: var(--bg-tertiary);
   cursor: not-allowed;
-  color: #999;
+  color: var(--text-tertiary);
 }
 
 .form-select option {

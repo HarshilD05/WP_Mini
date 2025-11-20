@@ -1,0 +1,18 @@
+[
+  {
+    "id": 1,
+    "name": "Rahul Sharma",
+    "email": "rahul.sharma@student.college.edu",
+    "committee": "ACM",
+    "role": "lead",
+    "image": null
+  },
+  {
+    "id": 2,
+    "name": "Priya Mehta",
+    "email": "priya.mehta@college.edu",
+    "committee": "Synapse",
+    "role": "chairperson",
+    "image": null
+  }
+]
