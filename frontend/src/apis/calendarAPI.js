@@ -12,16 +12,19 @@ const getAuthHeaders = () => {
 };
 
 /**
- * Get calendar events for a specific month (returns dates with events)
- * @param {string} yearMonth - Format: "YYYY-MM" (e.g., "2025-01")
- * @returns {Promise<Array>} Array of dates with events
+ * Get calendar overview for a specific month
+ * Example: "2025-01"
+ * -> Fetches list of dates that have events
  */
 export const getCalendarMonth = async (yearMonth) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/requests/getCalendar/${yearMonth}`, {
-      method: 'GET',
-      headers: getAuthHeaders(),
-    });
+    const response = await fetch(
+      `${API_BASE_URL}/api/requests/getCalendar/${yearMonth}`,
+      {
+        method: 'GET',
+        headers: getAuthHeaders(),
+      }
+    );
 
     if (!response.ok) {
       const error = await response.json();
@@ -36,17 +39,20 @@ export const getCalendarMonth = async (yearMonth) => {
 };
 
 /**
- * Get events for a specific date (only approved events)
- * @param {string} yearMonth - Format: "YYYY-MM" (e.g., "2025-01")
- * @param {string} day - Day of month (e.g., "12")
- * @returns {Promise<Array>} Array of approved events for that date
+ * Get events for a specific day
+ * yearMonth: "2025-01"
+ * day: "12"
+ * -> Fetches all events for that date
  */
 export const getCalendarDay = async (yearMonth, day) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/requests/getCalendar/${yearMonth}/${day}`, {
-      method: 'GET',
-      headers: getAuthHeaders(),
-    });
+    const response = await fetch(
+      `${API_BASE_URL}/api/requests/getCalendar/${yearMonth}/${day}`,
+      {
+        method: 'GET',
+        headers: getAuthHeaders(),
+      }
+    );
 
     if (!response.ok) {
       const error = await response.json();
@@ -61,9 +67,7 @@ export const getCalendarDay = async (yearMonth, day) => {
 };
 
 /**
- * Fetches requests for a specific date (legacy helper)
- * @param {Date} date - The date to fetch requests for
- * @returns {Promise<Array>} Array of request objects for that date
+ * Helper: Get events for a JS Date object
  */
 export const getRequestsByDate = async (date) => {
   try {
@@ -71,7 +75,7 @@ export const getRequestsByDate = async (date) => {
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     const yearMonth = `${year}-${month}`;
-    
+
     return await getCalendarDay(yearMonth, day);
   } catch (error) {
     console.error('Error fetching requests by date:', error);
@@ -80,16 +84,14 @@ export const getRequestsByDate = async (date) => {
 };
 
 /**
- * Fetches requests for a specific month (legacy helper)
- * @param {number} year - The year
- * @param {number} month - The month (0-11)
- * @returns {Promise<Array>} Array of request objects for that month
+ * Helper: Get requests for a specific month (year, monthIndex)
+ * monthIndex = 0–11
  */
-export const getRequestsByMonth = async (year, month) => {
+export const getRequestsByMonth = async (year, monthIndex) => {
   try {
-    const monthStr = String(month + 1).padStart(2, '0');
+    const monthStr = String(monthIndex + 1).padStart(2, '0');
     const yearMonth = `${year}-${monthStr}`;
-    
+
     return await getCalendarMonth(yearMonth);
   } catch (error) {
     console.error('Error fetching requests by month:', error);

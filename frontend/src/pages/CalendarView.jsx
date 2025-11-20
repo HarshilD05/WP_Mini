@@ -1,117 +1,90 @@
 import React, { useState, useEffect } from 'react';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
-import { format, isSameDay } from 'date-fns';
-import { getRequestsByMonth } from '../apis/calendarAPI';
+import { format } from 'date-fns';
+import { getRequestsByMonth, getCalendarDay } from '../apis/calendarAPI';
 import './CalendarView.css';
 
 const CalendarView = () => {
   const [date, setDate] = useState(new Date());
   const [activeStartDate, setActiveStartDate] = useState(new Date());
-  const [requests, setRequests] = useState([]);
+  const [eventDates, setEventDates] = useState([]); // <-- ARRAY OF DATES ONLY
   const [loading, setLoading] = useState(true);
   const [selectedDay, setSelectedDay] = useState(null);
   const [showDayModal, setShowDayModal] = useState(false);
 
-  // Fetch requests for the current visible month
+  // ⬇ Fetch month overview (only event dates)
   useEffect(() => {
-    const fetchRequests = async () => {
+    const fetchMonthEvents = async () => {
       setLoading(true);
       try {
         const year = activeStartDate.getFullYear();
         const month = activeStartDate.getMonth();
+
         const data = await getRequestsByMonth(year, month);
-        setRequests(data);
+        console.log(data);
+        // Backend returns { success, month, event_on: ["YYYY-MM-DD"] }
+        setEventDates(data.event_on || []);
       } catch (error) {
-        console.error('Error loading requests:', error);
+        console.error('Error loading monthly events:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchRequests();
+    fetchMonthEvents();
   }, [activeStartDate]);
 
-  // Get requests for a specific day
-  const getRequestsForDay = (day) => {
-    return requests.filter(request => {
-      const requestDate = new Date(request.fromDateTime);
-      return isSameDay(requestDate, day);
-    });
+  // ⬇ Check whether this tile/day has events
+  const hasEvents = (day) => {
+    const dateStr = format(day, 'yyyy-MM-dd');
+     console.log('Checking date:', dateStr, 'In array?', eventDates.includes(dateStr));
+  
+    return eventDates.includes(dateStr);
   };
 
-  // Get status color for request
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'pending':
-        return '#f59e0b'; // Orange
-      case 'approved':
-        return '#10b981'; // Green
-      case 'rejected':
-        return '#ef4444'; // Red
-      default:
-        return '#6b7280'; // Gray
+  // ⬇ When user clicks a day tile
+  const handleDayClick = async (value) => {
+    const year = value.getFullYear();
+    const month = String(value.getMonth() + 1).padStart(2, '0');
+    const day = String(value.getDate()).padStart(2, '0');
+    const yearMonth = `${year}-${month}`;
+
+    // Only fetch details if we know this day has events
+    if (!hasEvents(value)) return;
+
+    try {
+      const data = await getCalendarDay(yearMonth, day);
+
+      setSelectedDay({
+        date: value,
+        requests: data.events || []
+      });
+
+      setShowDayModal(true);
+    } catch (error) {
+      console.error('Error fetching day events:', error);
     }
   };
 
-  // Get location color
-  const getLocationColor = (location) => {
-    switch (location) {
-      case 'Seminar Hall':
-        return '#3b82f6'; // Blue
-      case 'Library Seminar Hall':
-        return '#8b5cf6'; // Purple
-      case 'Stall':
-        return '#ec4899'; // Pink
-      case 'Canteen':
-        return '#14b8a6'; // Teal
-      default:
-        return '#6b7280'; // Gray
-    }
-  };
-
-  // Custom tile content - adds colored lines for events
+  // ⬇ Colored indicator inside calendar tile
   const tileContent = ({ date, view }) => {
-    if (view === 'month') {
-      const dayRequests = getRequestsForDay(date);
-      
-      if (dayRequests.length > 0) {
-        return (
-          <div className="event-indicators">
-            {dayRequests.map((request, index) => (
-              <div
-                key={request.id}
-                className="event-line"
-                style={{ backgroundColor: getLocationColor(request.location) }}
-                title={`${request.committee} - ${request.location}`}
-              />
-            ))}
-          </div>
-        );
-      }
+    if (view !== 'month') return null;
+
+    if (hasEvents(date)) {
+      return (
+        <div className="event-dot"></div>
+      );
     }
+
     return null;
   };
 
-  // Handle day click
-  const handleDayClick = (value) => {
-    const dayRequests = getRequestsForDay(value);
-    if (dayRequests.length > 0) {
-      setSelectedDay({ date: value, requests: dayRequests });
-      setShowDayModal(true);
-    }
-  };
-
-  // Format time range
-  const formatTimeRange = (fromDateTime, toDateTime) => {
-    const from = new Date(fromDateTime);
-    const to = new Date(toDateTime);
-    return `${format(from, 'h:mm a')} - ${format(to, 'h:mm a')}`;
-  };
-
-  // Handle month navigation
-  const handleActiveStartDateChange = ({ activeStartDate: newActiveStartDate }) => {
-    setActiveStartDate(newActiveStartDate);
+  // ⬇ Time formatting helper
+  const formatTimeRange = (start, end) => {
+    const s = new Date(`1970-01-01T${start}:00`);
+    const e = new Date(`1970-01-01T${end}:00`);
+    return `${format(s, 'h:mm a')} - ${format(e, 'h:mm a')}`;
   };
 
   return (
@@ -120,7 +93,7 @@ const CalendarView = () => {
         <div className="calendar-header">
           <h1>Event Calendar</h1>
         </div>
-        
+
         {loading ? (
           <div className="loading-container">
             <div className="loading-spinner"></div>
@@ -133,7 +106,9 @@ const CalendarView = () => {
                 onChange={setDate}
                 value={date}
                 activeStartDate={activeStartDate}
-                onActiveStartDateChange={handleActiveStartDateChange}
+                onActiveStartDateChange={({ activeStartDate }) =>
+                  setActiveStartDate(activeStartDate)
+                }
                 onClickDay={handleDayClick}
                 tileContent={tileContent}
                 showNeighboringMonth={true}
@@ -142,26 +117,22 @@ const CalendarView = () => {
                 calendarType="iso8601"
                 tileClassName={({ date: tileDate, view }) => {
                   const classes = [];
-                  
+
                   if (view === 'month') {
-                    // Mark Sundays
-                    if (tileDate.getDay() === 0) {
-                      classes.push('sunday-tile');
-                    }
-                    
-                    // Hide neighboring month dates
+                    if (tileDate.getDay() === 0) classes.push('sunday-tile');
                     if (tileDate.getMonth() !== activeStartDate.getMonth()) {
                       classes.push('neighboring-month');
                     }
                   }
-                  
+
                   return classes.join(' ');
                 }}
               />
             </div>
-
+            
             {/* Legend */}
-            <div className="calendar-legend">
+            
+            {/* <div className="calendar-legend">
               <h3>Event Key</h3>
               <div className="legend-items">
                 <div className="legend-item">
@@ -181,11 +152,12 @@ const CalendarView = () => {
                   <span>Canteen</span>
                 </div>
               </div>
-            </div>
+            </div> */}
+
           </div>
         )}
 
-        {/* Day Details Modal */}
+        {/* ⬇ Day Details Modal */}
         {showDayModal && selectedDay && (
           <div className="modal-overlay" onClick={() => setShowDayModal(false)}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -195,63 +167,48 @@ const CalendarView = () => {
                   ×
                 </button>
               </div>
-              
+
               <div className="modal-body">
-                {selectedDay.requests.map((request) => (
-                  <div key={request.id} className="event-card">
+                {selectedDay.requests.map((event) => (
+                  <div key={event._id} className="event-card">
                     <div className="event-card-header">
-                      <div 
-                        className="event-status-indicator"
-                        style={{ backgroundColor: getLocationColor(request.location) }}
-                      />
+                      <div className="event-status-indicator" />
                       <div className="event-card-info">
-                        <h3>{request.committee}</h3>
-                        <span className={`status-badge status-${request.status}`}>
-                          {request.status}
+                        <h3>{event.eventName}</h3>
+                        <span className={`status-badge status-${event.status}`}>
+                          {event.status}
                         </span>
                       </div>
                     </div>
-                    
+
                     <div className="event-card-details">
                       <div className="detail-row">
+                        <strong>Committee:</strong>
+                        <span>{event.committee}</span>
+                      </div>
+
+                      <div className="detail-row">
                         <strong>Time:</strong>
-                        <span>{formatTimeRange(request.fromDateTime, request.toDateTime)}</span>
+                        <span>{formatTimeRange(event.startTime, event.endTime)}</span>
                       </div>
+
                       <div className="detail-row">
-                        <strong>Location:</strong>
-                        <span>
-                          {request.location}
-                          {request.floor && ` - Floor ${request.floor}`}
-                        </span>
+                        <strong>Venue:</strong>
+                        <span>{event.venue}</span>
                       </div>
+
                       <div className="detail-row">
-                        <strong>Faculty:</strong>
-                        <span>{request.facultyName}</span>
-                      </div>
-                      <div className="detail-row">
-                        <strong>Submitted by:</strong>
-                        <span>{request.submittedBy}</span>
+                        <strong>Description:</strong>
+                        <span>{event.description}</span>
                       </div>
                     </div>
-
-                    <div className="event-description">
-                      <strong>Description:</strong>
-                      <p>{request.description}</p>
-                    </div>
-
-                    {request.stallDescription && (
-                      <div className="stall-info">
-                        <strong>Stall Details:</strong>
-                        <p>{request.stallDescription}</p>
-                        <div className="stall-cost">Cost: ₹{request.stallCost}</div>
-                      </div>
-                    )}
                   </div>
                 ))}
               </div>
             </div>
           </div>
         )}
+
       </div>
     </div>
   );
