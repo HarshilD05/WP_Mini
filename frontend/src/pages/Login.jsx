@@ -29,6 +29,13 @@ function Login() {
     try {
       const response = await login(formData);
       
+      // Debug log for role mapping
+      console.log('Login successful:', {
+        role: response.role,
+        name: response.name,
+        userId: response.userId
+      });
+      
       // Store user data in session storage
       sessionStorage.setItem('authToken', response.token);
       sessionStorage.setItem('userId', response.userId);

@@ -15,9 +15,54 @@ const getAuthHeaders = () => {
 };
 
 /**
+ * Transform API response data to match component expected format
+ * @param {Object} apiRequest - Request object from API
+ * @returns {Object} Transformed request object
+ */
+const transformRequestData = (apiRequest) => {
+  // Calculate approval stage from approvalChain
+  const approvedCount = apiRequest.approvalChain.filter(a => a.status === 'approved').length;
+  const rejectedIndex = apiRequest.approvalChain.findIndex(a => a.status === 'rejected');
+  
+  // Format date
+  const eventDate = new Date(apiRequest.eventDate);
+  const formattedDate = eventDate.toLocaleDateString('en-US', { 
+    year: 'numeric', 
+    month: 'short', 
+    day: 'numeric' 
+  });
+  
+  return {
+    id: apiRequest.requestId,
+    eventName: apiRequest.eventName,
+    committee: apiRequest.committee,
+    date: formattedDate,
+    time: `${apiRequest.startTime} - ${apiRequest.endTime}`,
+    location: apiRequest.venue,
+    status: apiRequest.status,
+    approvalStage: approvedCount + 1, // Current stage (1-based index)
+    rejectedAt: rejectedIndex >= 0 ? rejectedIndex + 1 : null,
+    description: apiRequest.description,
+    rejectionReason: apiRequest.rejectionReason,
+    specialRequirements: apiRequest.specialRequirements,
+    approvalChain: apiRequest.approvalChain,
+    downloadAvailable: apiRequest.downloadAvailable,
+    venueBooked: apiRequest.venueBooked,
+    // Original fields
+    _id: apiRequest._id,
+    userId: apiRequest.userId,
+    eventDate: apiRequest.eventDate,
+    startTime: apiRequest.startTime,
+    endTime: apiRequest.endTime,
+    createdAt: apiRequest.createdAt,
+    updatedAt: apiRequest.updatedAt,
+  };
+};
+
+/**
  * Create a new request
  * @param {Object} requestData - The request form data
- * @param {string} requestData.title - Event title
+ * @param {string} requestData.eventName - Event title
  * @param {string} requestData.description - Event description
  * @param {string} requestData.committee - Committee name
  * @param {string} requestData.venue - Event venue
@@ -28,7 +73,7 @@ const getAuthHeaders = () => {
  */
 export const createRequest = async (requestData) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/requests/create`, {
+    const response = await fetch(`${API_BASE_URL}/api/requests/`, {
       method: 'POST',
       headers: getAuthHeaders(),
       body: JSON.stringify(requestData),
@@ -39,7 +84,19 @@ export const createRequest = async (requestData) => {
       throw new Error(error.message || 'Failed to create request');
     }
 
-    return await response.json();
+    const result = await response.json();
+    
+    // Extract request from nested structure
+    if (result.success && result.data && result.data.request) {
+      return {
+        success: true,
+        message: result.message,
+        requestId: result.data.request.requestId,
+        request: transformRequestData(result.data.request)
+      };
+    }
+    
+    return result;
   } catch (error) {
     console.error('Error creating request:', error);
     throw error;
@@ -62,7 +119,15 @@ export const getMyRequests = async () => {
       throw new Error(error.message || 'Failed to fetch requests');
     }
 
-    return await response.json();
+    const result = await response.json();
+    
+    // Extract data array from nested structure
+    if (result.success && result.data && Array.isArray(result.data)) {
+      return result.data.map(transformRequestData);
+    }
+    
+    // Fallback for different response structure
+    return Array.isArray(result) ? result.map(transformRequestData) : [];
   } catch (error) {
     console.error('Error fetching my requests:', error);
     throw error;
@@ -90,7 +155,15 @@ export const getAllRequests = async (status = null) => {
       throw new Error(error.message || 'Failed to fetch requests');
     }
 
-    return await response.json();
+    const result = await response.json();
+    
+    // Extract data array from nested structure
+    if (result.success && result.data && Array.isArray(result.data)) {
+      return result.data.map(transformRequestData);
+    }
+    
+    // Fallback for different response structure
+    return Array.isArray(result) ? result.map(transformRequestData) : [];
   } catch (error) {
     console.error('Error fetching all requests:', error);
     throw error;

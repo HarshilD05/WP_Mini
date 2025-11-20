@@ -1,48 +1,38 @@
 import React, { useState, useEffect } from 'react';
-import FormSelect from '../components/FormSelect';
+import { useNavigate } from 'react-router-dom';
 import FormTextArea from '../components/FormTextArea';
-import DateTimePicker from '../components/DateTimePicker';
 import FormInput from '../components/FormInput';
-import { getLocations, getFaculties, submitRequest } from '../apis/requestAPI';
+import { submitRequest } from '../apis/requestAPI';
+import { getDashboardPath } from '../utils/roleHelper';
 import './RequestForm.css';
 
 const RequestForm = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    faculty: '',
-    location: '',
-    floor: '',
-    fromDateTime: '',
-    toDateTime: '',
+    eventName: '',
     description: '',
-    stallCost: '',
+    committee: '',
+    venue: '',
+    floor: '',
+    eventDate: '',
+    startTime: '',
+    endTime: '',
+    stallPrice: '',
     stallDescription: ''
   });
 
   const [errors, setErrors] = useState({});
-  const [locations, setLocations] = useState([]);
-  const [faculties, setFaculties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
-  // Fetch locations and faculties on component mount
+  // Auto-fill committee from sessionStorage
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [locationsData, facultiesData] = await Promise.all([
-          getLocations(),
-          getFaculties()
-        ]);
-        setLocations(locationsData);
-        setFaculties(facultiesData);
-      } catch (error) {
-        console.error('Error loading data:', error);
-        alert('Error loading form data. Please refresh the page.');
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    fetchData();
+    const userCommittee = sessionStorage.getItem('userCommittee') || '';
+    setFormData(prev => ({
+      ...prev,
+      committee: userCommittee
+    }));
+    setLoading(false);
   }, []);
 
   const handleChange = (e) => {
@@ -64,48 +54,57 @@ const RequestForm = () => {
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.faculty) {
-      newErrors.faculty = 'Please select a faculty member';
-    }
-
-    if (!formData.location) {
-      newErrors.location = 'Please select a location';
-    }
-
-    // Validate floor if stall is selected
-    const isStallLocation = formData.location === 'stall';
-    if (isStallLocation && !formData.floor) {
-      newErrors.floor = 'Please select a floor for the stall';
-    }
-
-    if (!formData.fromDateTime) {
-      newErrors.fromDateTime = 'From date and time is required';
-    }
-
-    if (!formData.toDateTime) {
-      newErrors.toDateTime = 'To date and time is required';
-    }
-
-    if (formData.fromDateTime && formData.toDateTime) {
-      if (new Date(formData.toDateTime) <= new Date(formData.fromDateTime)) {
-        newErrors.toDateTime = 'End date must be after start date';
-      }
+    if (!formData.eventName.trim()) {
+      newErrors.eventName = 'Event eventName is required';
     }
 
     if (!formData.description.trim()) {
       newErrors.description = 'Event description is required';
     }
 
-    // Validate stall-specific fields if stall location is selected
-    if (isStallLocation) {
-      if (!formData.stallCost) {
-        newErrors.stallCost = 'Stall cost is required for stall locations';
-      } else if (isNaN(formData.stallCost) || parseFloat(formData.stallCost) < 0) {
-        newErrors.stallCost = 'Please enter a valid cost';
+    if (!formData.committee.trim()) {
+      newErrors.committee = 'Committee is required';
+    }
+
+    if (!formData.venue) {
+      newErrors.venue = 'Please select a venue';
+    }
+
+    // Validate floor if stall is selected
+    const isStallVenue = formData.venue === 'Stall';
+    if (isStallVenue && !formData.floor) {
+      newErrors.floor = 'Please select a floor for the stall';
+    }
+
+    if (!formData.eventDate) {
+      newErrors.eventDate = 'Event Date is required';
+    }
+
+    if (!formData.startTime) {
+      newErrors.startTime = 'Start time is required';
+    }
+
+    if (!formData.endTime) {
+      newErrors.endTime = 'End time is required';
+    }
+
+    // Validate that end time is after start time (same day)
+    if (formData.startTime && formData.endTime) {
+      if (formData.endTime <= formData.startTime) {
+        newErrors.endTime = 'End time must be after start time';
+      }
+    }
+
+    // Validate stall-specific fields if stall is selected
+    if (isStallVenue) {
+      if (!formData.stallPrice) {
+        newErrors.stallPrice = 'Stall price is required for stall venues';
+      } else if (isNaN(formData.stallPrice) || parseFloat(formData.stallPrice) < 0) {
+        newErrors.stallPrice = 'Please enter a valid price';
       }
 
       if (!formData.stallDescription.trim()) {
-        newErrors.stallDescription = 'Stall description is required for stall locations';
+        newErrors.stallDescription = 'Stall description is required for stall venues';
       }
     }
 
@@ -119,52 +118,72 @@ const RequestForm = () => {
     if (validateForm()) {
       setSubmitting(true);
       try {
-        const response = await submitRequest(formData);
-        alert(`Request submitted successfully! Request ID: ${response.requestId}`);
+        // Prepare data for API - merge stall fields into description JSON
+        const isStallVenue = formData.venue === 'Stall';
+        const descriptionData = {
+          description: formData.description,
+          ...(isStallVenue && {
+            stallFloor: formData.floor,
+            stallPrice: formData.stallPrice,
+            stallDescription: formData.stallDescription
+          })
+        };
+
+        const requestData = {
+          eventName: formData.eventName,
+          description: JSON.stringify(descriptionData),
+          committee: formData.committee,
+          venue: formData.venue,
+          eventDate: formData.eventDate,
+          startTime: formData.startTime,
+          endTime: formData.endTime
+        };
+
+        console.log("Request Data being sent to API:");
+        console.log(requestData);
+
+        const response = await submitRequest(requestData);
         
-        // Reset form after successful submission
-        setFormData({
-          faculty: '',
-          location: '',
-          floor: '',
-          fromDateTime: '',
-          toDateTime: '',
-          description: '',
-          stallCost: '',
-          stallDescription: ''
-        });
-        setErrors({});
+        // Show success message
+        if (response.success) {
+          alert(`Request submitted successfully! Request ID: ${response.requestId}`);
+          
+          // Navigate to home page based on user role
+          const userRole = sessionStorage.getItem('userRole');
+          const dashboardPath = getDashboardPath(userRole);
+          navigate(dashboardPath);
+        } else {
+          throw new Error(response.message || 'Failed to submit request');
+        }
       } catch (error) {
-        alert('Error submitting request. Please try again.');
+        alert(error.message || 'Error submitting request. Please try again.');
       } finally {
         setSubmitting(false);
       }
     }
   };
 
-  const isStallLocation = formData.location === 'stall';
+  // No additional options needed
 
-  // Format faculties for select dropdown
-  const facultyOptions = faculties.map(faculty => ({
-    value: faculty.email,
-    label: `${faculty.name} (${faculty.department})`
-  }));
+  const isStallVenue = formData.venue === 'Stall';
 
-  // Format locations for select dropdown
-  const locationOptions = locations.map(location => ({
-    value: location.value,
-    label: location.label
-  }));
+  // Venue options
+  const venueOptions = [
+    { value: 'Seminar Hall', label: 'Seminar Hall' },
+    { value: 'Canteen', label: 'Canteen' },
+    { value: 'Stall', label: 'Stall' },
+    { value: 'Library Meeting Room', label: 'Library Meeting Room' }
+  ];
 
   // Floor options for stall
   const floorOptions = [
-    { value: 'ground', label: 'Ground' },
-    { value: '1', label: '1' },
-    { value: '2', label: '2' },
-    { value: '3', label: '3' },
-    { value: '4', label: '4' },
-    { value: '5', label: '5' },
-    { value: '6', label: '6' }
+    { value: 'Ground', label: 'Ground Floor' },
+    { value: '1', label: '1st Floor' },
+    { value: '2', label: '2nd Floor' },
+    { value: '3', label: '3rd Floor' },
+    { value: '4', label: '4th Floor' },
+    { value: '5', label: '5th Floor' },
+    { value: '6', label: '6th Floor' }
   ];
 
   if (loading) {
@@ -186,72 +205,125 @@ const RequestForm = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="request-form">
-          {/* To (Faculty) */}
-          <FormSelect
-            label="To (Faculty Member)"
-            name="faculty"
-            value={formData.faculty}
+          {/* Event Name */}
+          <FormInput
+            label="Event Name"
+            type="text"
+            name="eventName"
+            value={formData.eventName}
             onChange={handleChange}
-            options={facultyOptions}
+            placeholder="Enter event name"
             required={true}
-            placeholder="Select faculty member"
           />
-          {errors.faculty && <span className="error-message">{errors.faculty}</span>}
+          {errors.eventName && <span className="error-message">{errors.eventName}</span>}
 
-          {/* Location and Floor (if stall) */}
+          {/* Committee (auto-filled, read-only) */}
+          <FormInput
+            label="Committee"
+            type="text"
+            name="committee"
+            value={formData.committee}
+            onChange={handleChange}
+            placeholder="Committee name"
+            required={true}
+            readOnly={true}
+            disabled={true}
+          />
+          {errors.committee && <span className="error-message">{errors.committee}</span>}
+
+          {/* Venue and Floor (if stall) in same row */}
           <div className="location-row">
             <div className="location-col">
-              <FormSelect
-                label="Location"
-                name="location"
-                value={formData.location}
+              <label className="form-label">
+                Venue <span className="required">*</span>
+              </label>
+              <select
+                name="venue"
+                value={formData.venue}
                 onChange={handleChange}
-                options={locationOptions}
+                className="form-input"
                 required={true}
-                placeholder="Select event location"
-              />
-              {errors.location && <span className="error-message">{errors.location}</span>}
+              >
+                <option value="">Select venue</option>
+                {venueOptions.map(option => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+              {errors.venue && <span className="error-message">{errors.venue}</span>}
             </div>
 
-            {isStallLocation && (
+            {isStallVenue && (
               <div className="floor-col">
-                <FormSelect
-                  label="Floor"
+                <label className="form-label">
+                  Floor <span className="required">*</span>
+                </label>
+                <select
                   name="floor"
                   value={formData.floor}
                   onChange={handleChange}
-                  options={floorOptions}
+                  className="form-input"
                   required={true}
-                  placeholder="Select floor"
-                />
+                >
+                  <option value="">Select floor</option>
+                  {floorOptions.map(option => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
                 {errors.floor && <span className="error-message">{errors.floor}</span>}
               </div>
             )}
           </div>
 
-          {/* From and To Date & Time in a row */}
+          {/* Event Date */}
+          <div className="form-group">
+            <label className="form-label">
+              Event Date <span className="required">*</span>
+            </label>
+            <input
+              type="date"
+              name="eventDate"
+              value={formData.eventDate}
+              onChange={handleChange}
+              className="form-input"
+              required={true}
+            />
+            {errors.eventDate && <span className="error-message">{errors.eventDate}</span>}
+          </div>
+
+          {/* Start and End Time in a row */}
           <div className="datetime-row">
             <div className="datetime-col">
-              <DateTimePicker
-                label="From Date & Time"
-                name="fromDateTime"
-                value={formData.fromDateTime}
+              <label className="form-label">
+                Start Time <span className="required">*</span>
+              </label>
+              <input
+                type="time"
+                name="startTime"
+                value={formData.startTime}
                 onChange={handleChange}
+                className="form-input"
                 required={true}
               />
-              {errors.fromDateTime && <span className="error-message">{errors.fromDateTime}</span>}
+              {errors.startTime && <span className="error-message">{errors.startTime}</span>}
             </div>
 
             <div className="datetime-col">
-              <DateTimePicker
-                label="To Date & Time"
-                name="toDateTime"
-                value={formData.toDateTime}
+              <label className="form-label">
+                End Time <span className="required">*</span>
+              </label>
+              <input
+                type="time"
+                name="endTime"
+                value={formData.endTime}
                 onChange={handleChange}
+                className="form-input"
                 required={true}
-                min={formData.fromDateTime}
               />
-              {errors.toDateTime && <span className="error-message">{errors.toDateTime}</span>}
+              {errors.endTime && <span className="error-message">{errors.endTime}</span>}
             </div>
           </div>
 
@@ -268,20 +340,20 @@ const RequestForm = () => {
           {errors.description && <span className="error-message">{errors.description}</span>}
 
           {/* Dynamic Stall Fields */}
-          {isStallLocation && (
+          {isStallVenue && (
             <div className="stall-section">
               <h3 className="section-title">Stall Information</h3>
               
               <FormInput
-                label="Stall Cost (₹)"
+                label="Stall Price (₹)"
                 type="number"
-                name="stallCost"
-                value={formData.stallCost}
+                name="stallPrice"
+                value={formData.stallPrice}
                 onChange={handleChange}
-                placeholder="Enter estimated cost"
-                required={isStallLocation}
+                placeholder="Enter stall price"
+                required={isStallVenue}
               />
-              {errors.stallCost && <span className="error-message">{errors.stallCost}</span>}
+              {errors.stallPrice && <span className="error-message">{errors.stallPrice}</span>}
 
               <FormTextArea
                 label="Stall Description"
@@ -289,7 +361,7 @@ const RequestForm = () => {
                 value={formData.stallDescription}
                 onChange={handleChange}
                 placeholder="Describe what will be displayed/sold at the stall"
-                required={isStallLocation}
+                required={isStallVenue}
                 rows={4}
               />
               {errors.stallDescription && <span className="error-message">{errors.stallDescription}</span>}
@@ -306,14 +378,17 @@ const RequestForm = () => {
               disabled={submitting}
               onClick={() => {
                 if (window.confirm('Are you sure you want to cancel? All data will be lost.')) {
+                  const userCommittee = sessionStorage.getItem('userCommittee') || '';
                   setFormData({
-                    faculty: '',
-                    location: '',
-                    floor: '',
-                    fromDateTime: '',
-                    toDateTime: '',
+                    eventName: '',
                     description: '',
-                    stallCost: '',
+                    committee: userCommittee,
+                    venue: '',
+                    floor: '',
+                    eventDate: '',
+                    startTime: '',
+                    endTime: '',
+                    stallPrice: '',
                     stallDescription: ''
                   });
                   setErrors({});

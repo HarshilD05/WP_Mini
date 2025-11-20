@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Home, Calendar, Users, X } from 'lucide-react';
+import { getMenuType } from '../utils/roleHelper';
 import './Sidebar.css';
 
 const Sidebar = ({ isOpen, onClose, userRole = 'admin' }) => {
@@ -23,7 +24,8 @@ const Sidebar = ({ isOpen, onClose, userRole = 'admin' }) => {
     ]
   };
 
-  const currentMenuItems = menuItems[userRole.toLowerCase()] || menuItems.committee;
+  const menuType = getMenuType(userRole);
+  const currentMenuItems = menuItems[menuType] || menuItems.committee;
 
   const handleNavigate = (path) => {
     navigate(path);

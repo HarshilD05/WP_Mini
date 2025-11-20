@@ -64,6 +64,7 @@ const requestSchema = new mongoose.Schema({
   },
   venue: {
     type: String,
+    enum: ["Canteen", "Seminar Hall", "Stall", "Library Meeting Room"],
     required: true,
   },
   specialRequirements: {
