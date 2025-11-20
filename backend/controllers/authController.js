@@ -2,7 +2,7 @@ const User = require("../models/User");
 const generateToken = require("../utils/generateToken");
 
 async function registerUser(data, file){
-    const { name, email, password, role} = data;
+    const { name, email, password, role, committee} = data;
 
     const existing = await User.findOne({email});
     if (existing) throw new Error("User exist karta hai");
@@ -12,6 +12,7 @@ async function registerUser(data, file){
         email,
         password,
         role,
+        committee,
         sign: file ? file.path : null
     };
 

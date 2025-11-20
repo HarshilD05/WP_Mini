@@ -31,7 +31,12 @@ const userSchema = new mongoose.Schema({
 
     role:{
         type: String,
-        enum: ["Student Club", "Student Chapter", "Faculty Coordinator", "TPO", "Vice Principal", "Principal"],
+        enum: ["Lead", "Chairperson", "Faculty Coordinator", "TPO", "Vice Principal", "Principal"],
+    },
+
+    committee:{
+        type: String,
+        enum: ["GDG Student Club", "Synapse Club", "ACM Student Chapter", "none"],
     },
 
     sign: {

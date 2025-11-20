@@ -7,7 +7,7 @@ const morgan = require('morgan');
 const connectDB = require('./config/database');
 const jwt = require('jsonwebtoken');
 const authRoutes = require('./routes/authRoutes');
-
+const requestRoutes = require("./routes/requestRoutes");
 
 connectDB();
 
@@ -19,9 +19,10 @@ app.use(morgan('dev')); // log
 app.use(express.json()); // body parsee
 app.use(express.urlencoded({ extended: true }));
 app.use("/uploads", express.static("uploads"));
+app.use("/public", express.static("public"));
 
 app.use("/api/auth", authRoutes);
-
+app.use("/api/requests", requestRoutes);
 
 app.get('/', (req, res) => {
   res.json({ 
