@@ -1,6 +1,16 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:5000';
+
+/**
+ * Get auth headers with token
+ */
+const getAuthHeaders = () => {
+  const token = localStorage.getItem('authToken');
+  return {
+    'Authorization': token ? `Bearer ${token}` : '',
+  };
+};
 
 /**
  * Login user with email and password
@@ -11,89 +21,97 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
  */
 export const login = async ({ email, password }) => {
   try {
-    // TODO: Replace with actual API call
-    // Simulating API response for development
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    // Mock user data - replace with actual API response
-    const mockResponse = {
-      userId: '123',
-      name: 'Admin User',
-      role: 'teacher', // or 'student', 'teacher'
-      email: email,
-      token: 'mock-jwt-token'
-    };
+    const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Login failed');
+    }
+
+    const data = await response.json();
     
     // Store token in localStorage
-    if (mockResponse.token) {
-      localStorage.setItem('token', mockResponse.token);
+    if (data.token) {
+      localStorage.setItem('authToken', data.token);
     }
     
-    return mockResponse;
-    
-    /* 
-    // Uncomment when backend is ready
-    const response = await axios.post(`${API_BASE_URL}/auth/login`, {
-      email,
-      password
-    });
-    
-    if (response.data.token) {
-      localStorage.setItem('token', response.data.token);
-    }
-    
-    return response.data;
-    */
+    // Return structured data with user information
+    return {
+      token: data.token,
+      userId: data.user.userId,
+      name: data.user.name,
+      email: data.user.email,
+      role: data.user.role,
+      committee: data.user.committee,
+      message: data.message
+    };
   } catch (error) {
     console.error('Login error:', error);
-    throw error.response?.data || { message: 'An error occurred during login' };
+    throw error;
   }
 };
 
 /**
- * Register new user
+ * Register new user with photograph
  * @param {Object} userData - User registration data
  * @param {string} userData.name - User's full name
  * @param {string} userData.email - User email
  * @param {string} userData.password - User password
+ * @param {string} userData.role - User role
+ * @param {string} userData.committee - User committee (optional)
+ * @param {File} userData.sign - User photograph
  * @returns {Promise<Object>} Response containing user data and token
  */
-export const signup = async ({ name, email, password }) => {
+export const register = async ({ name, email, password, role, committee, sign }) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/auth/signup`, {
-      name,
-      email,
-      password
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('email', email);
+    formData.append('password', password);
+    formData.append('role', role);
+    if (committee) {
+      formData.append('committee', committee);
+    }
+    if (sign) {
+      formData.append('sign', sign);
+    }
+
+    const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
+      method: 'POST',
+      body: formData,
     });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Registration failed');
+    }
+
+    const data = await response.json();
     
-    // Store token in localStorage
-    if (response.data.token) {
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+    // Store token in localStorage if provided
+    if (data.token) {
+      localStorage.setItem('authToken', data.token);
     }
     
-    return response.data;
+    return data;
   } catch (error) {
-    console.error('Signup error:', error);
-    throw error.response?.data || { message: 'An error occurred during signup' };
+    console.error('Registration error:', error);
+    throw error;
   }
 };
 
 /**
- * Logout user
+ * Logout user - Clear all authentication data
  */
 export const logout = () => {
-  localStorage.removeItem('token');
-  localStorage.removeItem('user');
-};
-
-/**
- * Get current user from localStorage
- * @returns {Object|null} User object or null
- */
-export const getCurrentUser = () => {
-  const userStr = localStorage.getItem('user');
-  return userStr ? JSON.parse(userStr) : null;
+  localStorage.removeItem('authToken');
+  sessionStorage.clear();
 };
 
 /**
@@ -101,7 +119,7 @@ export const getCurrentUser = () => {
  * @returns {string|null} Token or null
  */
 export const getToken = () => {
-  return localStorage.getItem('token');
+  return localStorage.getItem('authToken');
 };
 
 /**

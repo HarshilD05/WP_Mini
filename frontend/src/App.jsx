@@ -22,12 +22,23 @@ function App() {
   const [userRole, setUserRole] = useState('');
   const [userName, setUserName] = useState('');
   
-  // Load user data from session storage
+  // Load user data from session storage on mount and when session changes
   useEffect(() => {
-    const role = sessionStorage.getItem('userRole') || 'admin';
-    const name = sessionStorage.getItem('userName') || 'Admin User';
-    setUserRole(role);
-    setUserName(name);
+    const loadUserData = () => {
+      const role = sessionStorage.getItem('userRole') || '';
+      const name = sessionStorage.getItem('userName') || '';
+      setUserRole(role);
+      setUserName(name);
+    };
+    
+    loadUserData();
+    
+    // Listen for storage changes (e.g., when user logs in/out in another tab)
+    window.addEventListener('storage', loadUserData);
+    
+    return () => {
+      window.removeEventListener('storage', loadUserData);
+    };
   }, []);
 
   const toggleSidebar = () => {

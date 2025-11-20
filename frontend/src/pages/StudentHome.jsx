@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Plus, Search, X, AlertCircle, Download } from 'lucide-react';
 import RequestCard from '../components/RequestCard';
 import ApprovalProgress from '../components/ApprovalProgress';
+import { getMyRequests } from '../apis/requestAPI';
 import './StudentHome.css';
 
 const StudentHome = () => {
@@ -18,50 +19,8 @@ const StudentHome = () => {
     const fetchRequests = async () => {
       setLoading(true);
       try {
-        // TODO: Replace with actual API endpoint
-        // const response = await fetch('/api/student/requests');
-        // const data = await response.json();
-        
-        // Mock data for development
-        await new Promise(resolve => setTimeout(resolve, 500));
-        const mockData = [
-          {
-            id: 'REQ-2025-001',
-            eventName: 'Tech Fest 2025',
-            committee: 'Computer Science Society',
-            date: '2025-11-10',
-            time: '09:00 AM - 06:00 PM',
-            location: 'Main Auditorium',
-            status: 'pending',
-            approvalStage: 2,
-            description: 'Annual technical festival featuring hackathons.',
-          },
-          {
-            id: 'REQ-2025-002',
-            eventName: 'AI Workshop',
-            committee: 'Robotics Club',
-            date: '2025-10-25',
-            time: '02:00 PM - 05:00 PM',
-            location: 'Computer Lab 3',
-            status: 'approved',
-            approvalStage: 5,
-            description: 'One day workshop on GenAI tools for students.',
-          },
-          {
-            id: 'REQ-2025-003',
-            eventName: 'Freshers Party',
-            committee: 'Cultural Committee',
-            date: '2025-10-05',
-            time: '06:00 PM - 10:00 PM',
-            location: 'College Grounds',
-            status: 'rejected',
-            approvalStage: 3,
-            rejectedAt: 3,
-            description: 'Welcome party for first year students.',
-            rejectionReason: 'Date conflicts with mid-term exams.'
-          }
-        ];
-        setRequests(mockData);
+        const data = await getMyRequests();
+        setRequests(data);
       } catch (error) {
         console.error('Error fetching requests:', error);
       } finally {

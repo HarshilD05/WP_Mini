@@ -28,10 +28,16 @@ function Login() {
 
     try {
       const response = await login(formData);
+      
       // Store user data in session storage
+      sessionStorage.setItem('authToken', response.token);
       sessionStorage.setItem('userId', response.userId);
       sessionStorage.setItem('userRole', response.role);
       sessionStorage.setItem('userName', response.name);
+      sessionStorage.setItem('userEmail', response.email);
+      if (response.committee) {
+        sessionStorage.setItem('userCommittee', response.committee);
+      }
       
       // Redirect to home which will redirect based on role
       navigate('/');

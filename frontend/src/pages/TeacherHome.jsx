@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Plus, Search, X, MapPin, Users, FileText, Calendar } from 'lucide-react';
 import RequestCard from '../components/RequestCard';
 import ApprovalProgress from '../components/ApprovalProgress';
+import { getAllRequests, approveRequest, rejectRequest } from '../apis/requestAPI';
 import './TeacherHome.css';
 
 const TeacherHome = () => {
@@ -16,56 +17,9 @@ const TeacherHome = () => {
     const fetchRequests = async () => {
       setLoading(true);
       try {
-        // TODO: Replace with actual API endpoint
-        // const response = await fetch('/api/teacher/requests');
-        // const data = await response.json();
-        
-        // Mock data for development
-        await new Promise(resolve => setTimeout(resolve, 500));
-        const mockData = [
-          {
-            id: 'REQ-2025-008',
-            studentName: 'Arjun Sharma',
-            eventName: 'Robotics Workshop Phase 1',
-            committee: 'Robotics Club',
-            date: '2025-11-12',
-            time: '10:00 AM - 4:00 PM',
-            location: 'Engineering Hall B',
-            status: 'pending',
-            approvalStage: 2,
-            description: 'A hands-on workshop introducing first-year students to Arduino and basic sensor integration.',
-            submittedOn: '2025-11-01',
-          },
-          {
-            id: 'REQ-2025-009',
-            studentName: 'Zara Ali',
-            eventName: 'Inter-College Debate',
-            committee: 'Debate Society',
-            date: '2025-11-15',
-            time: '2:00 PM - 6:00 PM',
-            location: 'Main Auditorium',
-            status: 'pending',
-            approvalStage: 2,
-            description: 'Hosting the annual debate championship with external judges.',
-            submittedOn: '2025-11-02',
-          },
-          {
-            id: 'REQ-2025-004',
-            studentName: 'Rohan Gupta',
-            eventName: 'Gaming Tournament',
-            committee: 'Computer Science Society',
-            date: '2025-10-28',
-            time: '9:00 AM - 6:00 PM',
-            location: 'Computer Lab 1',
-            status: 'approved',
-            approvalStage: 5,
-            description: 'CS:GO and Valorant tournament for all students.',
-            submittedOn: '2025-10-15',
-            reviewedOn: '2025-10-18',
-            reviewedBy: 'Prof. Kumar',
-          }
-        ];
-        setRequests(mockData);
+        // Fetch all requests (no status filter, backend handles faculty filtering)
+        const data = await getAllRequests();
+        setRequests(data);
       } catch (error) {
         console.error('Error fetching requests:', error);
       } finally {
@@ -92,21 +46,29 @@ const TeacherHome = () => {
   };
 
   const handleApprove = async (requestId) => {
-    // TODO: Replace with actual API call
-    // await fetch(`/api/teacher/requests/${requestId}/approve`, { method: 'POST' });
-    setRequests(prev => prev.map(req => 
-      req.id === requestId ? { ...req, status: 'approved', reviewedOn: new Date().toISOString().split('T')[0] } : req
-    ));
-    setSelectedRequest(null);
+    try {
+      await approveRequest(requestId);
+      // Refresh the requests list after approval
+      const data = await getAllRequests();
+      setRequests(data);
+      setSelectedRequest(null);
+    } catch (error) {
+      console.error('Error approving request:', error);
+      alert('Failed to approve request. Please try again.');
+    }
   };
 
   const handleReject = async (requestId, reason) => {
-    // TODO: Replace with actual API call
-    // await fetch(`/api/teacher/requests/${requestId}/reject`, { method: 'POST', body: JSON.stringify({ reason }) });
-    setRequests(prev => prev.map(req => 
-      req.id === requestId ? { ...req, status: 'rejected', rejectionReason: reason, reviewedOn: new Date().toISOString().split('T')[0] } : req
-    ));
-    setSelectedRequest(null);
+    try {
+      await rejectRequest(requestId, reason);
+      // Refresh the requests list after rejection
+      const data = await getAllRequests();
+      setRequests(data);
+      setSelectedRequest(null);
+    } catch (error) {
+      console.error('Error rejecting request:', error);
+      alert('Failed to reject request. Please try again.');
+    }
   };
 
   return (
