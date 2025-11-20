@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Calendar, Users, X } from 'lucide-react';
+import { Home, Calendar, Users, X } from 'lucide-react';
 import './Sidebar.css';
 
 const Sidebar = ({ isOpen, onClose, userRole = 'admin' }) => {
@@ -9,12 +9,15 @@ const Sidebar = ({ isOpen, onClose, userRole = 'admin' }) => {
 
   const menuItems = {
     committee: [
+      { path: '/dashboard', label: 'Home', icon: Home },
       { path: '/calendar', label: 'Event Calendar', icon: Calendar }
     ],
     teacher: [
+      { path: '/teacher-dashboard', label: 'Home', icon: Home },
       { path: '/calendar', label: 'Event Calendar', icon: Calendar }
     ],
     admin: [
+      { path: '/admin', label: 'Home', icon: Home },
       { path: '/calendar', label: 'Event Calendar', icon: Calendar },
       { path: '/admin/manage-users', label: 'Manage Users', icon: Users }
     ]

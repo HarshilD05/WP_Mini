@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Mail, Lock, CheckCircle, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { login } from '../apis/authAPI';
 import './Login.css';
@@ -72,7 +72,6 @@ function Login() {
         <div className="form-section">
           <div className="form-header">
             <h3>Sign In</h3>
-            <p>Access your dashboard to manage permissions.</p>
 
             <form onSubmit={handleSubmit}>
               {error && (
@@ -82,13 +81,13 @@ function Login() {
               )}
 
               <div className="input-group">
-                <label>Institutional Email</label>
+                <label>Email</label>
                 <div className="input-wrapper">
                   <Mail className="input-icon" size={20} />
                   <input 
                     type="email" 
                     className="form-input"
-                    placeholder="id@institution.edu"
+                    placeholder="your.email@example.com"
                     value={formData.email}
                     onChange={(e) => setFormData({...formData, email: e.target.value})}
                     required 
@@ -111,32 +110,25 @@ function Login() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    style={{position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#9CA3AF'}}
+                    className="password-toggle"
                   >
                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
                 </div>
               </div>
 
-              <div style={{display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem'}}>
-                <a href="#" style={{color: '#1976D2', fontSize: '0.875rem', textDecoration: 'none'}}>Forgot Password?</a>
+              <div className="forgot-password-wrapper">
+                <a href="#" className="forgot-password-link">Forgot Password?</a>
               </div>
 
               <button type="submit" className="submit-btn" disabled={isLoading}>
-                {isLoading ? 'Logging in...' : (
+                {isLoading ? 'Signing in...' : (
                   <>
-                    Login to Dashboard <ArrowRight size={20} />
+                    Sign In <ArrowRight size={20} />
                   </>
                 )}
               </button>
             </form>
-
-            <div className="toggle-text">
-              Don't have an account yet?{' '}
-              <Link to="/signup" className="toggle-link">
-                Sign Up
-              </Link>
-            </div>
           </div>
         </div>
 

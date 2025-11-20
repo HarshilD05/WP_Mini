@@ -1,16 +1,17 @@
 .modal-overlay{position:fixed;inset:0;background:var(--overlay-bg);display:flex;align-items:center;justify-content:center;z-index:1000;padding:1rem}
-.modal-card{background:var(--modal-bg);border-radius:8px;max-width:720px;width:100%;box-shadow:var(--shadow-xl)}
+.modal-card{background:var(--modal-bg);border-radius:8px;max-width:720px;width:100%;box-shadow:var(--shadow-xl);max-height:80vh;display:flex;flex-direction:column}
 .modal-header{display:flex;justify-content:space-between;align-items:center;padding:1rem 1.25rem;border-bottom:1px solid var(--border-primary)}
-.modal-body{padding:1rem 1.25rem;display:flex;flex-direction:column;gap:1rem}
+.modal-header h3{margin:0;color:var(--text-primary)}
+.modal-body{padding:1rem 1.25rem;display:flex;flex-direction:column;gap:1rem;overflow-y:auto;flex:1}
 .row{display:flex;gap:1rem}
 .col{flex:1;display:flex;flex-direction:column}
-.col label{font-weight:600;margin-bottom:0.35rem;color:var(--text-primary)}
+.col label{font-weight:600;margin-bottom:0.35rem;color:var(--text-primary);text-align:left}
 .col input,.col select{padding:0.6rem;border:1px solid var(--border-secondary);border-radius:6px;background:var(--bg-primary);color:var(--text-primary)}
 .modal-actions{display:flex;justify-content:flex-end;gap:0.75rem;padding:1rem 1.25rem;border-top:1px solid var(--border-primary)}
 .btn{padding:0.6rem 1rem;border-radius:6px;font-weight:600;cursor:pointer}
 .btn-cancel{background:var(--bg-primary);border:1px solid var(--border-secondary);color:var(--text-primary)}
+.btn-cancel:hover{background:var(--hover-bg)}
 .btn-submit{background:var(--accent-primary);color:var(--bg-primary);border:1px solid var(--accent-primary)}
+.btn-submit:hover{background:var(--accent-hover)}
 .error-message{color:var(--status-rejected);padding:0.5rem;border-radius:6px;background:rgba(239,68,68,0.1)}
-.close-btn{background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--text-primary)}
-.modal-header h2{color:var(--text-primary)}
 @media(max-width:768px){.row{flex-direction:column}}

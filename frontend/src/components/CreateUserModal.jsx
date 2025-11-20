@@ -90,17 +90,12 @@ const CreateUserModal = ({ onClose, onCreate, initialCommittees = [] }) => {
       <div className="modal-card" onClick={(e)=>e.stopPropagation()}>
         <div className="modal-header">
           <h3>Create New User</h3>
-          <button className="close-btn" onClick={onClose}>×</button>
         </div>
 
         <form className="modal-body" onSubmit={handleSubmit}>
           {error && <div className="error-message">{error}</div>}
 
           <div className="row">
-            <div className="col">
-              <label>Email</label>
-              <input name="email" type="email" value={formData.email} onChange={handleChange} required />
-            </div>
             <div className="col">
               <label>Name</label>
               <input name="name" type="text" value={formData.name} onChange={handleChange} required />
@@ -109,14 +104,12 @@ const CreateUserModal = ({ onClose, onCreate, initialCommittees = [] }) => {
 
           <div className="row">
             <div className="col">
-              <label>Committee</label>
-              <select name="committee" value={formData.committee} onChange={handleChange}>
-                <option value="">Select Committee</option>
-                {initialCommittees.map((c, i) => (
-                  <option key={i} value={c}>{c}</option>
-                ))}
-              </select>
+              <label>Email</label>
+              <input name="email" type="email" value={formData.email} onChange={handleChange} required />
             </div>
+          </div>
+
+          <div className="row">
             <div className="col">
               <label>Role</label>
               <select name="role" value={formData.role} onChange={handleChange} required>
@@ -126,6 +119,17 @@ const CreateUserModal = ({ onClose, onCreate, initialCommittees = [] }) => {
                 ))}
               </select>
             </div>
+            {(formData.role === 'lead' || formData.role === 'chairperson') && (
+              <div className="col">
+                <label>Committee</label>
+                <select name="committee" value={formData.committee} onChange={handleChange}>
+                  <option value="">Select Committee</option>
+                  {initialCommittees.map((c, i) => (
+                    <option key={i} value={c}>{c}</option>
+                  ))}
+                </select>
+              </div>
+            )}
           </div>
 
           <div className="row">
@@ -133,6 +137,9 @@ const CreateUserModal = ({ onClose, onCreate, initialCommittees = [] }) => {
               <label>Password</label>
               <input name="password" type="password" value={formData.password} onChange={handleChange} />
             </div>
+          </div>
+
+          <div className="row">
             <div className="col">
               <label>Confirm Password</label>
               <input name="confirmPassword" type="password" value={formData.confirmPassword} onChange={handleChange} />

@@ -3,13 +3,13 @@ import { useState, useEffect } from 'react'
 import Home from './pages/Home'
 import RequestForm from './pages/RequestForm'
 import Login from './pages/Login'
-import Signup from './pages/Signup'
-import StudentDashboard from './pages/StudentDashboard'
-import TeacherDashboard from './pages/TeacherDashboard'
+import StudentHome from './pages/StudentHome'
+import TeacherHome from './pages/TeacherHome'
 import CalendarView from './pages/CalendarView';
 import AdminHome from './pages/admin/AdminHome';
 import ManageUsers from './pages/admin/ManageUsers';
-import UserProfile from './pages/admin/UserProfile';
+import AdminUserProfile from './pages/admin/UserProfile';
+import UserProfile from './pages/UserProfile';
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -44,7 +44,6 @@ function App() {
         <Routes>
           {/* Public routes */}
           <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
           
           {/* Root route - redirects based on role */}
           <Route path="/" element={
@@ -71,12 +70,13 @@ function App() {
                   <Routes>
                     <Route path="/home" element={<Home />} />
                     <Route path="/request-form" element={<RequestForm />} />
-                    <Route path="/dashboard" element={<StudentDashboard />} />
-                    <Route path="/teacher-dashboard" element={<TeacherDashboard />} />
+                    <Route path="/dashboard" element={<StudentHome />} />
+                    <Route path="/teacher-dashboard" element={<TeacherHome />} />
                     <Route path="/calendar" element={<CalendarView />} />
+                    <Route path="/profile" element={<UserProfile />} />
                     <Route path="/admin" element={<AdminHome />} />
                     <Route path="/admin/manage-users" element={<ManageUsers />} />
-                    <Route path="/admin/user/:id" element={<UserProfile />} />
+                    <Route path="/admin/user/:id" element={<AdminUserProfile />} />
                   </Routes>
                 </main>
               </>

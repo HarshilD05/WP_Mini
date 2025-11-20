@@ -127,58 +127,60 @@ const CalendarView = () => {
             <p>Loading calendar...</p>
           </div>
         ) : (
-          <div className="calendar-wrapper">
-            <Calendar
-              onChange={setDate}
-              value={date}
-              activeStartDate={activeStartDate}
-              onActiveStartDateChange={handleActiveStartDateChange}
-              onClickDay={handleDayClick}
-              tileContent={tileContent}
-              showNeighboringMonth={true}
-              next2Label={null}
-              prev2Label={null}
-              calendarType="iso8601"
-              tileClassName={({ date: tileDate, view }) => {
-                const classes = [];
-                
-                if (view === 'month') {
-                  // Mark Sundays
-                  if (tileDate.getDay() === 0) {
-                    classes.push('sunday-tile');
+          <div className="calendar-content-wrapper">
+            <div className="calendar-main">
+              <Calendar
+                onChange={setDate}
+                value={date}
+                activeStartDate={activeStartDate}
+                onActiveStartDateChange={handleActiveStartDateChange}
+                onClickDay={handleDayClick}
+                tileContent={tileContent}
+                showNeighboringMonth={true}
+                next2Label={null}
+                prev2Label={null}
+                calendarType="iso8601"
+                tileClassName={({ date: tileDate, view }) => {
+                  const classes = [];
+                  
+                  if (view === 'month') {
+                    // Mark Sundays
+                    if (tileDate.getDay() === 0) {
+                      classes.push('sunday-tile');
+                    }
+                    
+                    // Hide neighboring month dates
+                    if (tileDate.getMonth() !== activeStartDate.getMonth()) {
+                      classes.push('neighboring-month');
+                    }
                   }
                   
-                  // Hide neighboring month dates
-                  if (tileDate.getMonth() !== activeStartDate.getMonth()) {
-                    classes.push('neighboring-month');
-                  }
-                }
-                
-                return classes.join(' ');
-              }}
-            />
+                  return classes.join(' ');
+                }}
+              />
+            </div>
 
             {/* Legend */}
             <div className="calendar-legend">
-                <h3>Location Types</h3>
-                <div className="legend-items">
+              <h3>Event Key</h3>
+              <div className="legend-items">
                 <div className="legend-item">
-                    <div className="legend-color" style={{ backgroundColor: '#3b82f6' }}></div>
-                    <span>Seminar Hall</span>
-                </div>
-                <div className="legend-item">
-                    <div className="legend-color" style={{ backgroundColor: '#8b5cf6' }}></div>
-                    <span>Library Seminar Hall</span>
+                  <div className="legend-color" style={{ backgroundColor: '#3b82f6' }}></div>
+                  <span>Seminar Hall</span>
                 </div>
                 <div className="legend-item">
-                    <div className="legend-color" style={{ backgroundColor: '#ec4899' }}></div>
-                    <span>Stall</span>
+                  <div className="legend-color" style={{ backgroundColor: '#8b5cf6' }}></div>
+                  <span>Library Seminar Hall</span>
                 </div>
                 <div className="legend-item">
-                    <div className="legend-color" style={{ backgroundColor: '#14b8a6' }}></div>
-                    <span>Canteen</span>
+                  <div className="legend-color" style={{ backgroundColor: '#ec4899' }}></div>
+                  <span>Stall</span>
                 </div>
+                <div className="legend-item">
+                  <div className="legend-color" style={{ backgroundColor: '#14b8a6' }}></div>
+                  <span>Canteen</span>
                 </div>
+              </div>
             </div>
           </div>
         )}

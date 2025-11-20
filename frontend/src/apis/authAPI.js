@@ -19,7 +19,7 @@ export const login = async ({ email, password }) => {
     const mockResponse = {
       userId: '123',
       name: 'Admin User',
-      role: 'admin', // or 'student', 'teacher'
+      role: 'teacher', // or 'student', 'teacher'
       email: email,
       token: 'mock-jwt-token'
     };

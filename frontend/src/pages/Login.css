@@ -1,21 +1,21 @@
 /* Login.css */
 .auth-container {
   min-height: 100vh;
-  background-color: #F5F5F5;
+  background-color: var(--bg-secondary);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 1rem;
-  font-family: sans-serif;
-  color: #334155;
+  font-family: system-ui, -apple-system, sans-serif;
+  color: var(--text-primary);
 }
 
 .auth-card {
   width: 100%;
   max-width: 1024px;
-  background-color: white;
+  background-color: var(--bg-primary);
   border-radius: 1rem;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  box-shadow: var(--shadow-xl);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -31,7 +31,7 @@
 /* Left Side - Branding */
 .brand-section {
   width: 100%;
-  background-color: #1976D2; /* Primary Blue */
+  background-color: #0f172a; /* Obsidian black */
   color: white;
   padding: 2rem;
   display: flex;
@@ -62,7 +62,7 @@
   padding: 0.5rem;
   border-radius: 0.5rem;
   display: flex;
-  color: #1976D2;
+  color: #0f172a;
 }
 
 .brand-title {
@@ -79,7 +79,7 @@
 }
 
 .hero-text p {
-  color: #DBEAFE; /* Light blue text */
+  color: #cbd5e1;
   font-size: 1.125rem;
   line-height: 1.6;
 }
@@ -113,7 +113,7 @@
 .form-section {
   width: 100%;
   padding: 2rem;
-  background-color: white;
+  background-color: var(--bg-primary);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -133,28 +133,24 @@
 }
 
 .form-header h3 {
-  font-size: 1.875rem;
+  font-size: 2rem;
   font-weight: bold;
-  color: #424242;
-  margin-bottom: 0.5rem;
-}
-
-.form-header p {
-  color: #64748B;
+  color: var(--text-primary);
   margin-bottom: 2rem;
+  text-align: left;
 }
 
 .input-group {
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.5rem;
 }
 
 .input-group label {
   display: block;
-  font-size: 0.875rem;
+  font-size: 1rem;
   font-weight: 600;
-  color: #374151;
-  margin-bottom: 0.25rem;
-  margin-left: 0.25rem;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+  text-align: left;
 }
 
 .input-wrapper {
@@ -166,42 +162,81 @@
   left: 0.75rem;
   top: 50%;
   transform: translateY(-50%);
-  color: #9CA3AF;
+  color: var(--text-tertiary);
 }
 
 .form-input {
   width: 100%;
   padding-left: 2.5rem;
-  padding-right: 1rem;
+  padding-right: 2.75rem;
   padding-top: 0.75rem;
   padding-bottom: 0.75rem;
   border-radius: 0.5rem;
-  border: 1px solid #D1D5DB;
+  border: 1px solid var(--border-secondary);
   outline: none;
   transition: all 0.2s;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
 }
 
 .form-input:focus {
-  border-color: #1976D2;
-  box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.password-toggle {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-tertiary);
+  display: flex;
+  align-items: center;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  transition: color 0.2s;
+}
+
+.password-toggle:hover {
+  color: var(--text-secondary);
 }
 
 .error-message {
-  background-color: #fed7d7;
-  color: #c53030;
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--status-rejected);
   padding: 12px 16px;
   border-radius: 8px;
   font-size: 14px;
-  border-left: 4px solid #fc8181;
-  margin-bottom: 1.25rem;
+  border-left: 4px solid var(--status-rejected);
+  margin-bottom: 1.5rem;
+}
+
+.forgot-password-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1.5rem;
+}
+
+.forgot-password-link {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.forgot-password-link:hover {
+  color: var(--text-primary);
 }
 
 .submit-btn {
   width: 100%;
-  background-color: #1976D2;
-  color: white;
-  font-weight: bold;
-  padding: 0.75rem;
+  background-color: var(--accent-primary);
+  color: var(--bg-primary);
+  font-weight: 600;
+  padding: 0.875rem;
   border-radius: 0.5rem;
   border: none;
   cursor: pointer;
@@ -209,34 +244,18 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  transition: background-color 0.3s;
-  margin-top: 1rem;
+  transition: all 0.3s;
+  font-size: 1rem;
 }
 
 .submit-btn:hover {
-  background-color: #1565C0;
+  background-color: var(--accent-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 .submit-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-}
-
-.toggle-text {
-  margin-top: 2rem;
-  text-align: center;
-  color: #4B5563;
-}
-
-.toggle-link {
-  color: #1976D2;
-  font-weight: bold;
-  background: none;
-  border: none;
-  cursor: pointer;
-  text-decoration: underline;
-}
-
-.toggle-link:hover {
-  color: #1565C0;
+  transform: none;
 }
