@@ -1,0 +1,30 @@
+Pages : 
+
+NP - Login / Signup Page 
+NP - Student Home Page
+  - Student Pending Requests
+NP - Teacher Home Page
+  - Pending Approvals for the Teacher
+  - List of All Requests sent to the Teacher
+
+HD - Calendar View Syncronised for All 
+
+HD - Create a new Request (Form)
+Request FORM Content
+- Location [Seminar hall, Library Seminar Hall, Stall [Floor No], Canteen ]
+- Text Area for description
+- From date Time , to date Time
+- Stall Cost 
+- Stall Descrtion text Area
+- Send to 
+
+
+HD - Admin 
+Total number of Users and Distribution Pie Chart
+Create new User Form
+ - email
+ - password
+ - user Type [Student, Teacher]
+ - Deptartment {put Option DJSC for any inter department stuff like trinity or Principal Account}
+
+
